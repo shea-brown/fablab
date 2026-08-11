@@ -1,4 +1,21 @@
+import { execSync } from "node:child_process";
 import withPWAInit from "@ducanh2912/next-pwa";
+
+// Build identity stamped at build time so the sidebar badge reflects what is
+// actually deployed instead of falling back to "dev" in production. Prefer an
+// explicit CI-provided hash; otherwise resolve the git short SHA; fall back to
+// "dev" only when neither is available (e.g. a source checkout with no .git).
+function resolveBuildHash() {
+  if (process.env.NEXT_PUBLIC_BUILD_HASH) return process.env.NEXT_PUBLIC_BUILD_HASH;
+  try {
+    return execSync("git rev-parse --short HEAD", {
+      stdio: ["ignore", "pipe", "ignore"],
+    }).toString().trim();
+  } catch {
+    return "dev";
+  }
+}
+const BUILD_HASH = resolveBuildHash();
 
 const withPWA = withPWAInit({
   dest: "public",
@@ -48,6 +65,10 @@ const contentSecurityPolicyReportOnly = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Expose the build hash to the client bundle (sidebar build badge).
+  env: {
+    NEXT_PUBLIC_BUILD_HASH: BUILD_HASH,
+  },
   // Self-hosting on Coolify: emit a standalone server bundle (.next/standalone) so the
   // Dockerfile can ship a lean runtime image. No-op on Vercel; this copy isn't deployed there.
   output: "standalone",

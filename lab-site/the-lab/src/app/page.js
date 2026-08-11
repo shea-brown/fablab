@@ -8,6 +8,9 @@ import MatrixRain from './components/effects/MatrixRain';
 function PublicNav() {
   const [ts, setTs] = useState('');
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const NAV_LINKS = [['/about', './about'], ['#pulse', './pulse'], ['#membership', './join'], ['#board', './board'], ['#contact', './contact']];
 
   useEffect(() => {
     const tick = () => setTs(new Date().toLocaleTimeString('en-US', { hour12: false }));
@@ -36,9 +39,9 @@ function PublicNav() {
         <Link href="/" style={{ color: 'var(--green)', fontFamily: 'var(--display)', fontSize: 15, letterSpacing: '-0.04em', textDecoration: 'none', textShadow: '0 0 12px var(--green)' }}>
           THE_LAB
         </Link>
-        <span style={{ color: 'var(--bd-hot)', opacity: 0.4, fontSize: 12 }}>|</span>
-        <nav style={{ display: 'flex', gap: 20 }}>
-          {[['#about', './about'], ['#pulse', './pulse'], ['#membership', './join'], ['#board', './board'], ['#contact', './contact']].map(([href, label]) => (
+        <span className="nav-links-desktop" style={{ color: 'var(--bd-hot)', opacity: 0.4, fontSize: 12 }}>|</span>
+        <nav className="nav-links-desktop" style={{ display: 'flex', gap: 20 }}>
+          {NAV_LINKS.map(([href, label]) => (
             <a key={href} href={href} style={{ color: 'var(--text-mid)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none', transition: 'color 0.12s' }}
               onMouseEnter={e => e.target.style.color = 'var(--green)'}
               onMouseLeave={e => e.target.style.color = 'var(--text-mid)'}
@@ -46,14 +49,56 @@ function PublicNav() {
           ))}
         </nav>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div className="nav-actions-desktop" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         <span style={{ color: 'var(--text-dim)', fontSize: 10, fontFamily: 'var(--mono)', letterSpacing: '0.05em' }}>{ts}</span>
         <span className="pill" style={{ background: 'rgba(57,255,20,0.1)' }}>
           <span className="dot pulse" style={{ background: 'var(--green)' }} />
           ONLINE
         </span>
+        <Link href="/auth/signin" style={{ color: 'var(--text-mid)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none', transition: 'color 0.12s' }}
+          onMouseEnter={e => e.target.style.color = 'var(--green)'}
+          onMouseLeave={e => e.target.style.color = 'var(--text-mid)'}
+        >sign in</Link>
         <Link href="/auth/register" className="btn btn--sm" style={{ fontSize: 10 }}>$ ./join</Link>
       </div>
+
+      {/* Mobile hamburger */}
+      <button
+        className="nav-hamburger" aria-label="Menu" aria-expanded={menuOpen}
+        onClick={() => setMenuOpen(o => !o)}
+        style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-bright)', fontSize: 20, lineHeight: 1, padding: 4 }}
+      >{menuOpen ? '✕' : '☰'}</button>
+
+      {/* Mobile dropdown menu */}
+      {menuOpen && (
+        <div className="nav-mobile-menu" style={{
+          position: 'fixed', top: 52, left: 0, right: 0, zIndex: 99,
+          background: 'rgba(5,8,5,0.98)', backdropFilter: 'blur(6px)',
+          borderBottom: '1px solid var(--bd-1)',
+          display: 'flex', flexDirection: 'column', padding: '8px 24px 16px',
+        }}>
+          {NAV_LINKS.map(([href, label]) => (
+            <a key={href} href={href} onClick={() => setMenuOpen(false)}
+              style={{ color: 'var(--text-mid)', fontSize: 13, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none', padding: '12px 0', borderBottom: '1px solid var(--bd-1)' }}
+            >{label}</a>
+          ))}
+          <Link href="/auth/signin" onClick={() => setMenuOpen(false)}
+            style={{ color: 'var(--text)', fontSize: 13, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none', padding: '12px 0' }}
+          >sign in</Link>
+          <Link href="/auth/register" onClick={() => setMenuOpen(false)} className="btn btn--sm" style={{ fontSize: 12, marginTop: 10, textAlign: 'center' }}>$ ./join</Link>
+        </div>
+      )}
+
+      <style>{`
+        @media (max-width: 760px) {
+          .nav-links-desktop { display: none !important; }
+          .nav-actions-desktop { display: none !important; }
+          .nav-hamburger { display: inline-flex !important; align-items: center; }
+        }
+        @media (min-width: 761px) {
+          .nav-mobile-menu { display: none !important; }
+        }
+      `}</style>
     </nav>
   );
 }
@@ -186,8 +231,9 @@ function HeroBoot({ memberCount }) {
 // ─── AboutSection ─────────────────────────────────────────────────────────────
 function AboutSection() {
   const EQUIPMENT = [
-    { icon: '◈', name: '3D Printers', detail: 'FDM + resin' },
+    { icon: '◈', name: '3D Printers', detail: 'FDM, multi-filament' },
     { icon: '◉', name: 'Laser Cutter', detail: '60W CO₂' },
+    { icon: '◉', name: 'Fiber Laser', detail: '20W' },
     { icon: '⊡', name: 'Vinyl Cutter', detail: 'Cricut + Silhouette' },
     { icon: '⊞', name: 'Electronics Lab', detail: 'Soldering, oscilloscope' },
     { icon: '⊟', name: 'Power Tools', detail: 'Drill press, saws' },
@@ -215,6 +261,9 @@ function AboutSection() {
             </div>
           </div>
         ))}
+      </div>
+      <div style={{ marginTop: 32 }}>
+        <Link href="/about" className="btn btn--ghost btn--sm" style={{ fontSize: 10 }}>Read the full story →</Link>
       </div>
     </section>
   );
@@ -263,9 +312,12 @@ function CommunityPulseSection({ memberCount }) {
         </div>
 
         {/* Activity stream */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }} className="pulse-grid">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 24 }} className="pulse-grid">
           <div>
-            <div style={{ color: 'var(--text-dim)', fontSize: 9, letterSpacing: '0.14em', marginBottom: 12 }}>OPEN_BOUNTIES</div>
+            <div style={{ color: 'var(--text-dim)', fontSize: 9, letterSpacing: '0.14em', marginBottom: 8 }}>OPEN_BOUNTIES</div>
+            <p style={{ color: 'var(--text-mid)', fontSize: 12, lineHeight: 1.6, margin: '0 0 14px', maxWidth: 620 }}>
+              Community-posted tasks with a reward. Pick one up, or post your own. It is how a lot of the work gets done around here.
+            </p>
             <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
               {loadingBounties ? (
                 <div style={{ padding: '16px 18px', color: 'var(--text-dim)', fontSize: 12, display: 'flex', gap: 8, alignItems: 'center' }}>
@@ -293,32 +345,8 @@ function CommunityPulseSection({ memberCount }) {
                 </table>
               )}
             </div>
-          </div>
-
-          {/* ASCII shop map */}
-          <div>
-            <div style={{ color: 'var(--text-dim)', fontSize: 9, letterSpacing: '0.14em', marginBottom: 12 }}>FACILITY_MAP</div>
-            <div className="card" style={{ padding: '16px 18px' }}>
-              <pre style={{ fontFamily: 'var(--mono)', fontSize: 11, color: 'var(--text-mid)', lineHeight: 1.5, margin: 0, whiteSpace: 'pre' }}>{`
-┌──────────────────────────────┐
-│  ENTRY        RESTROOMS      │
-│   ▶                     ██   │
-├──────────┬───────────────────┤
-│ LOUNGE   │  FABRICATION LAB  │
-│          │  [3D] [LASER]     │
-│  ◈◈◈    │  [VINYL] [CNC]    │
-├──────────┤                   │
-│ OFFICE   │  ELECTRONICS AREA │
-│          │  [SOLDER] [SCOPE] │
-└──────────┴───────────────────┘
-`.trim()}</pre>
-              <div style={{ marginTop: 12, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                {[['◈', 'Seating'], ['[X]', 'Equipment'], ['▶', 'Entrance']].map(([sym, lbl]) => (
-                  <div key={lbl} style={{ display: 'flex', gap: 6, alignItems: 'center', fontSize: 10, color: 'var(--text-dim)' }}>
-                    <span style={{ color: 'var(--green)', fontFamily: 'var(--mono)' }}>{sym}</span> {lbl}
-                  </div>
-                ))}
-              </div>
+            <div style={{ marginTop: 14 }}>
+              <Link href="/board/bounties" className="btn btn--ghost btn--sm" style={{ fontSize: 10 }}>browse all bounties →</Link>
             </div>
           </div>
         </div>
@@ -518,7 +546,6 @@ function ContactSection() {
                 {[
                   ['Members', '24/7 key fob'],
                   ['Public Events', 'Check calendar'],
-                  ['Open Lab', 'Sat 10am – 4pm'],
                 ].map(([k, v]) => (
                   <tr key={k}>
                     <td style={{ color: 'var(--text-mid)', padding: '4px 0' }}>{k}</td>
@@ -586,7 +613,7 @@ function PublicFooter() {
           <div>
             <div style={{ color: 'var(--text-dim)', fontSize: 9, letterSpacing: '0.14em', marginBottom: 12 }}>NAVIGATE</div>
             <nav style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {[['/#about', './about'], ['/#membership', './join'], ['/board-members', './board'], ['/code-of-conduct', './conduct'], ['/donate', './donate']].map(([href, label]) => (
+              {[['/about', './about'], ['/#membership', './join'], ['/board-members', './board'], ['/code-of-conduct', './conduct'], ['/donate', './donate']].map(([href, label]) => (
                 <Link key={href} href={href} style={{ color: 'var(--text-mid)', fontSize: 11, textDecoration: 'none', letterSpacing: '0.06em' }}
                   onMouseEnter={e => e.target.style.color = 'var(--green)'}
                   onMouseLeave={e => e.target.style.color = 'var(--text-mid)'}

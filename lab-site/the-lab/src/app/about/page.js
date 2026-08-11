@@ -6,8 +6,9 @@ export const metadata = {
 };
 
 const EQUIPMENT = [
-  { sym: '◈', name: '3D Printers', spec: 'FDM + resin; 0.1mm resolution' },
+  { sym: '◈', name: '3D Printers', spec: 'FDM, multi-filament; 0.1mm resolution' },
   { sym: '◉', name: 'Laser Cutter', spec: '60W CO₂; 24×18" bed' },
+  { sym: '◉', name: 'Fiber Laser', spec: '20W' },
   { sym: '⊡', name: 'Vinyl Cutter', spec: 'Cricut Maker + Silhouette Cameo' },
   { sym: '⊞', name: 'Electronics Lab', spec: 'Soldering, oscilloscope, bench PSU' },
   { sym: '⊟', name: 'Power Tools', spec: 'Drill press, jigsaw, band saw' },
@@ -24,6 +25,22 @@ const VALUES = [
 export default function AboutPage() {
   return (
     <div style={{ background: 'var(--bg)', minHeight: '100vh', paddingTop: 52 }}>
+      {/* Top bar — fills the reserved 52px and gives a way back to home */}
+      <nav style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
+        background: 'rgba(5,8,5,0.95)', backdropFilter: 'blur(6px)',
+        borderBottom: '1px solid var(--bd-1)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 24px', height: 52,
+      }}>
+        <Link href="/" style={{ color: 'var(--green)', fontFamily: 'var(--display)', fontSize: 15, letterSpacing: '-0.04em', textDecoration: 'none', textShadow: '0 0 12px var(--green)' }}>
+          THE_LAB
+        </Link>
+        <Link href="/" style={{ color: 'var(--text-mid)', fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', textDecoration: 'none' }}>
+          ← back to home
+        </Link>
+      </nav>
+
       {/* Hero */}
       <section style={{ padding: '80px 24px 60px', borderBottom: '1px solid var(--bd)', background: 'var(--bg-1)' }}>
         <div style={{ maxWidth: 900, margin: '0 auto' }}>
